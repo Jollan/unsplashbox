@@ -31,6 +31,6 @@ const authControllers = __importStar(require("../controllers/auth.controller"));
 const imageRouter = express_1.default.Router();
 imageRouter.post("/:collectionId", authControllers.protect, imageController.upload, imageController.createImage);
 imageRouter.delete("/:collectionId/:id", authControllers.protect, imageController.removeImage);
-imageRouter.get("/search", imageController.search);
+imageRouter.get("/search", authControllers.protect, imageController.search);
 imageRouter.get("/thumb", authControllers.protect, imageController.getImage);
 module.exports = imageRouter;

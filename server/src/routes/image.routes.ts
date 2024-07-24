@@ -15,7 +15,7 @@ imageRouter.delete(
   authControllers.protect,
   imageController.removeImage
 );
-imageRouter.get("/search", imageController.search);
+imageRouter.get("/search", authControllers.protect, imageController.search);
 imageRouter.get("/thumb", authControllers.protect, imageController.getImage);
 
 export = imageRouter;
