@@ -1,0 +1,65 @@
+@use "../../partials/variables" as vars;
+@use "../../partials/mixins" as mixins;
+@import "../../partials/responsives";
+
+.ui.fluid.container {
+  //   border: 1px solid black;
+  @include mobile {
+    @include mixins.relaxed;
+  }
+  min-height: calc(100vh - vars.$navbarh);
+  display: flex;
+  justify-content: center;
+
+  .content {
+    padding-top: 30px;
+    .head {
+      h1 {
+        width: min-content;
+        margin: auto;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #f2c593, #8a3282);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      p {
+        width: 30%;
+        @media (width <= 1024px) or (height <= 500px) {
+          width: 95%;
+         font-size: x-small;
+        }
+        margin: auto;
+        margin-bottom: 30px;
+        font-size: small;
+        text-align: center;
+        strong {
+          text-decoration: underline;
+        }
+      }
+    }
+    .grid.container {
+      > * {
+        padding: 5px;
+      }
+      .column {
+        .thumbnail {
+          cursor: pointer;
+          border-radius: 5px;
+          width: 100%;
+        }
+        .info {
+          margin-top: 10px;
+          .name {
+            font-weight: bold;
+            font-size: small;
+          }
+          .photo-count {
+            font-size: xx-small;
+            color: #6c727f;
+          }
+        }
+      }
+    }
+  }
+}

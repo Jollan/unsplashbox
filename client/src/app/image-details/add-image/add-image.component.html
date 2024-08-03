@@ -1,0 +1,39 @@
+<div class="container">
+  <div class="spinner-container" *ngIf="!loaderService.loaded()">
+    <app-loader type="spin"></app-loader>
+  </div>
+  <div class="content" *let="searchInput?.input?.value?.trim() as value">
+    <div class="header">
+      <h3>Add to Collections</h3>
+    </div>
+    <div class="search-input">
+      <app-search-input
+        (keyword)="value && collectionName.emit(value)"
+        #searchInput
+      ></app-search-input>
+    </div>
+    <span class="collection-count" *ngIf="value && collections.length">
+      {{ searchResult.length }} match(es)
+    </span>
+    <div class="collections">
+      @for (collection of searchResult; track $index) {
+      <ng-container *let="collection.images[0]?._id as id">
+        <ng-container *ngIf="id">
+          <app-collection
+            action="+ Add to Collection"
+            icon="add.svg"
+            [name]="collection.name"
+            [photoCount]="collection.images.length"
+            [thumbnailUrl]="apiUrl + '?ids=' + id + '&width=50&height=50'"
+            (click)="collectionId.emit(collection._id)"
+          ></app-collection>
+        </ng-container>
+      </ng-container>
+      }
+    </div>
+    <div class="footer" *ngIf="value">
+      <span> The value in the field input will use like collection name. </span>
+      <button type="button" (click)="collectionName.emit(value)">New</button>
+    </div>
+  </div>
+</div>

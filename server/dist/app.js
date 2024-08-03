@@ -14,6 +14,7 @@ const image_routes_1 = __importDefault(require("./routes/image.routes"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const collection_routes_1 = __importDefault(require("./routes/collection.routes"));
 const error_controller_1 = __importDefault(require("./controllers/error.controller"));
+const image_controller_1 = require("./controllers/image.controller");
 const app = (0, express_1.default)();
 const limiter = (0, express_rate_limit_1.default)({
     limit: 1000,
@@ -24,7 +25,7 @@ app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)());
 app.use("/api", limiter);
 app.use((0, cookie_parser_1.default)());
-app.use(express_1.default.static("./uploads"));
+app.use(image_controller_1.setResourcePolicy, express_1.default.static("./uploads"));
 app.use(express_1.default.json({ limit: "10kb" }));
 app.use((0, express_mongo_sanitize_1.default)());
 app.use((0, morgan_1.default)("dev"));

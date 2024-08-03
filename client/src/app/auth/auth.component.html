@@ -1,0 +1,64 @@
+<div class="content">
+  <div class="form">
+    @let mode = loginMode ? "Login" : "Register";
+    <h2>{{ mode }} Here</h2>
+    <form (ngSubmit)="onFormSubmitted()" #form="ngForm">
+      <div class="input" *ngIf="!loginMode">
+        <label for="name">Name</label>
+        <input
+          name="name"
+          type="text"
+          id="name"
+          placeholder="Enter your name"
+          required
+          ngModel
+        />
+      </div>
+      <div class="input">
+        <label for="email">Email Address</label>
+        <input
+          name="email"
+          type="email"
+          id="email"
+          placeholder="Email address"
+          required
+          email
+          ngModel
+        />
+      </div>
+      <div class="input">
+        <label for="password">Password</label>
+        <input
+          name="password"
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+          minlength="8"
+          ngModel
+        />
+      </div>
+      <div class="input" *ngIf="!loginMode">
+        <label for="confpassword">Confirm Password</label>
+        <input
+          name="confirmPassword"
+          type="password"
+          id="confpassword"
+          placeholder="Confirm your Password"
+          required
+          minlength="8"
+          ngModel
+        />
+      </div>
+      <button type="submit" class="button">{{ mode }}</button>
+      <p>
+        {{
+          loginMode ? "Do not have an accout yet?" : "Already have an account ?"
+        }}
+        <button type="button" class="button" (click)="switchMode()">
+          {{ loginMode ? "Register" : "Login" }} Here.
+        </button>
+      </p>
+    </form>
+  </div>
+</div>

@@ -11,11 +11,15 @@ imageRouter.post(
   imageController.createImage
 );
 imageRouter.delete(
-  "/:collectionId/:id",
+  "/:collectionId/:unsplashId",
   authControllers.protect,
   imageController.removeImage
 );
-imageRouter.get("/search", authControllers.protect, imageController.search);
-imageRouter.get("/thumb", authControllers.protect, imageController.getImage);
+imageRouter.get("/search", imageController.search);
+imageRouter.get(
+  "/thumb",
+  imageController.setResourcePolicy,
+  imageController.getImage
+);
 
 export = imageRouter;

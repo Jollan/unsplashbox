@@ -23,17 +23,19 @@ exports.getCollections = (0, asyncErrorHandler_1.default)((req, res) => __awaite
     const collections = yield collection_model_1.default.find({ user: req.user }).populate("images");
     res.status(200).json({
         status: "success",
-        data: { collections },
+        data: { count: collections.length, collections },
     });
 }));
 exports.createCollection = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const image = yield (0, image_controller_1.newImage)(req).save();
+    let image = yield (0, image_controller_1.newImage)(req).save();
+    const imagePath = image.path;
+    image.path = undefined;
     try {
-        var collection = yield collection_model_1.default.create(Object.assign(Object.assign({}, req.body), { images: [image._id], user: req.user._id }));
+        var collection = yield collection_model_1.default.create(Object.assign(Object.assign({}, req.body), { images: [image], user: req.user._id }));
     }
     catch (error) {
         yield image_model_1.default.findByIdAndDelete(image);
-        fs_1.default.unlinkSync(path_1.default.resolve(image.path));
+        fs_1.default.unlink(path_1.default.resolve(imagePath), (errot) => { });
         throw error;
     }
     res.status(201).json({

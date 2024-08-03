@@ -1,0 +1,12 @@
+@use "../partials/variables" as vars;
+@use "../partials/mixins" as mixins;
+@import "../partials/responsives";
+
+.main {
+  .ui.fluid.container {
+    padding-top: vars.$navbarh;
+    @include mobile {
+      @include mixins.relaxed;
+    }
+  }
+}

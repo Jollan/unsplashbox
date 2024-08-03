@@ -1,0 +1,23 @@
+<div class="ui fluid container">
+  <div class="content">
+    <div class="head">
+      <h1>{{ collection?.name }}</h1>
+      <div class="photo-count">{{ collection?.images?.length }} photos</div>
+    </div>
+    <div class="ui four column padded grid container">
+      @for (columnImages of images; track $index) {
+      <div class="column">
+        @for (image of columnImages; track $index) {
+        <img
+          class="image"
+          [src]="image.url"
+          [alt]="image.originalname"
+          [routerLink]="['/images/', image._id]"
+          [state]="collection"
+        />
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

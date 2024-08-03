@@ -1,0 +1,21 @@
+<div class="container">
+  @if (currPage > 1) {
+  <img
+    class="arrow"
+    src="arrow_back.svg"
+    alt="arrow_back"
+    (click)="previous()"
+  />
+  }
+  <div class="page">
+    {{ currPage }}
+  </div>
+  @if (currPage < totalPage) {
+  <img
+    class="arrow"
+    src="arrow_forward.svg"
+    alt="arrow_forward"
+    (click)="next()"
+  />
+  }
+</div>

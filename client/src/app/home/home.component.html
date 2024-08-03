@@ -1,0 +1,12 @@
+@if (!loaderService.loaded()) {
+<app-loader type="bar"></app-loader>
+}
+<div class="ui fluid container">
+  <div class="content">
+    <h1>Search</h1>
+    <p>Search high-resolution images from Unsplash</p>
+    <div class="search-input">
+      <app-search-input (keyword)="onSearch($event)"></app-search-input>
+    </div>
+  </div>
+</div>

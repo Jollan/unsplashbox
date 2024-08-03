@@ -1,0 +1,60 @@
+<div class="ui fluid container">
+  <div class="ui grid container">
+    <div class="two column row">
+      <div class="column">
+        <img class="image" [src]="url" [alt]="filename" />
+      </div>
+      <div class="column">
+        <div class="first-row">
+          <div class="author">
+            <img class="avatar" [src]="profileImageUrl" alt="user_avatar" />
+            <span>{{ author }}</span>
+          </div>
+          <div class="date">
+            Publish on {{ publishedDate | date : "fullDate" }}
+          </div>
+          <div class="buttons">
+            <button class="button" (click)="addMode = true">
+              <img src="Plus.svg" alt="add" />
+              <span> Add to Collection</span>
+            </button>
+            <a class="button" [href]="downloadUrl" [download]="filename">
+              <img src="down arrow.svg" alt="download" />
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+        <div class="second-row">
+          <h2 class="title">Collections</h2>
+          <div class="collections">
+            <app-dimmer *ngIf="!loaderService.loaded() && !addMode">
+              <app-loader type="spin"></app-loader>
+            </app-dimmer>
+            @for (collection of collections; track $index) {
+            <ng-container *let="collection.images[0]?._id as id">
+              <ng-container *ngIf="id">
+                <app-collection
+                  action="- Remove"
+                  icon="trash.svg"
+                  [name]="collection.name"
+                  [photoCount]="collection.images.length"
+                  [thumbnailUrl]="apiUrl + '?ids=' + id + '&width=50&height=50'"
+                  (click)="removeFromCollection(collection._id)"
+                ></app-collection>
+              </ng-container>
+            </ng-container>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-dimmer *ngIf="addMode" (click)="addMode = false"></app-dimmer>
+<div class="image add" *ngIf="addMode">
+  <app-add-image
+    [collections]="nCollections"
+    (collectionId)="addToCollection($event)"
+    (collectionName)="createCollection($event); addMode = false"
+  ></app-add-image>
+</div>

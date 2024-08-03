@@ -10,6 +10,7 @@ import imageRouter from "./routes/image.routes";
 import authRouter from "./routes/auth.routes";
 import collectionRouter from "./routes/collection.routes";
 import globalErrorHandler from "./controllers/error.controller";
+import { setResourcePolicy } from "./controllers/image.controller";
 
 const app = express();
 
@@ -23,7 +24,7 @@ app.use(helmet());
 app.use(cors());
 app.use("/api", limiter);
 app.use(cookieParser());
-app.use(express.static("./uploads"));
+app.use(setResourcePolicy, express.static("./uploads"));
 app.use(express.json({ limit: "10kb" }));
 app.use(sanitize());
 app.use(morgan("dev"));

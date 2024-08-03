@@ -1,0 +1,51 @@
+@import "../../../partials/responsives";
+.collection-wrapper {
+  // border: 1px solid black;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #e5e7eb;
+    .action {
+      display: flex !important;
+      @media (width <= 1024px) or (height <= 500px) {
+        display: none !important;
+      }
+    }
+  }
+  .collection {
+    // border: 1px solid black;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    .thumbnail {
+      border-radius: 5px;
+    }
+    .label {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      .name {
+        font-size: smaller;
+        font-weight: bold;
+      }
+      .photo-count {
+        color: #6c727f;
+        font-size: small;
+      }
+    }
+    .action {
+      margin-right: 15px;
+      font-size: x-small;
+      font-weight: bold;
+      display: none;
+    }
+    .icon {
+      height: 20px;
+      display: none;
+      @media (width <= 1024px) or (height <= 500px) {
+        display: flex;
+      }
+    }
+  }
+}

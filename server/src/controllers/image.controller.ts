@@ -8,6 +8,7 @@ import asyncErrorHandler from "../utils/asyncErrorHandler";
 import Image from "../models/image.model";
 import CustomError from "../utils/customError";
 import Collection from "../models/collection.model";
+import { assign } from "lodash";
 
 const storage = multer.diskStorage({
   destination(req: any, file, cb) {
@@ -40,7 +41,7 @@ export const upload = asyncErrorHandler(
 
 export function newImage(req: any) {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const url = `${baseUrl}/images/${req.user!.id}/${req.file!.filename}`;
+  const url = `${baseUrl}/images/${req.user!.id}/${req.file.filename}`;
   const image = new Image({ ...req.body, ...req.file, url });
   return image;
 }
@@ -62,22 +63,29 @@ export const createImage = asyncErrorHandler(async (req, res) => {
 });
 
 export const removeImage = asyncErrorHandler(async (req, res) => {
-  const collection = await Collection.findById(req.params.collectionId);
+  const collection = await Collection.findById(
+    req.params.collectionId
+  ).populate<{ images: InstanceType<typeof Image>[] }>("images");
+
   if (!collection) {
     throw new CustomError("The collection does not exist.", 404);
   }
-  const imageId = collection.images.find((imageId) => {
-    return imageId.toString() === req.params.id;
+  const image = collection.images.find(({ unsplashId }) => {
+    return unsplashId === req.params.unsplashId;
   });
-  if (!imageId) {
+  if (!image) {
     throw new CustomError("The image does not exist on the collection.", 404);
   }
-  const image = await Image.findByIdAndDelete(imageId).select("+path");
-  fs.unlinkSync(path.resolve(image!.path));
-  collection.images = collection.images.filter((imageId) => {
-    return imageId.toString() !== image?.id;
+  const delImage = await Image.findByIdAndDelete(image).select("+path");
+  if (delImage) {
+    fs.unlink(path.resolve(delImage.path), (error) => {});
+  }
+  collection.images = collection.images.filter(({ unsplashId }) => {
+    return unsplashId !== image.unsplashId;
   });
-  collection.save({ validateBeforeSave: false });
+  if (!collection.images.length) await Collection.findByIdAndDelete(collection);
+  else collection.save({ validateBeforeSave: false });
+
   res.status(204).json({
     status: "success",
     data: null,
@@ -90,19 +98,31 @@ export const search = asyncErrorHandler(async (req, res) => {
   if (!query) {
     throw new CustomError("Do not know what search for.", 404);
   }
-  const params = `query=${query}&page=${page}&per_page=10`;
+  const params = `query=${query}&page=${page}&per_page=30`;
   const result = await axios.get(
     `https://api.unsplash.com/search/photos?${params}`,
     {
       headers: { Authorization: `Client-ID ${process.env.ACCESS_KEY}` },
     }
   );
+  const { results } = result.data;
+  for (let index = 0; index < results.length; index++) {
+    const image = results[index];
+    const buffer = await axios.get(image.urls.small, {
+      responseType: "arraybuffer",
+    });
+    assign(image, await sharp(buffer.data).metadata());
+  }
   res.status(200).json({
     status: "success",
     data: result.data,
   });
 });
 
+export const setResourcePolicy = (req: any, res: any, next: any) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+};
 export const getImage = asyncErrorHandler(async (req, res) => {
   let { ids, width, height } = req.query as any;
   [ids, width, height] = [ids?.trim(), +width?.trim(), +height?.trim()];
@@ -196,5 +216,5 @@ export const getImage = asyncErrorHandler(async (req, res) => {
       .composite(imagesToComposite)
       .toBuffer();
   }
-  res.type("image/png").send(buffer);
+  res.status(200).type("image/png").send(buffer);
 });

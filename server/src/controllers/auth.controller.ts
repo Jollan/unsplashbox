@@ -9,49 +9,52 @@ import { sendMail } from "../utils/email";
 const tokenCookieName = "jwt";
 const isProdEnv = process.env.NODE_ENV === "production";
 
-// const genAuthToken = (id: string) => {
-//   const token = jwt.sign({ id }, process.env.SECRET_KEY!, {
-//     expiresIn: process.env.EXPIRATION,
-//   });
-//   const decoded = jwt.decode(token) as jwt.JwtPayload;
-//   return { token, expiresIn: decoded.exp! - decoded.iat! };
-// };
-
-// export const sendTokenResponse = (
-//   res: e.Response,
-//   statusCode: number,
-//   user: InstanceType<typeof User>
-// ) => {
-//   const token = genAuthToken(user.id);
-//   user.active = user.password = undefined!;
-//   res.status(statusCode).json({
-//     status: "success",
-//     user,
-//     ...token,
-//   });
-// };
+const genAuthToken = (id: string) => {
+  const token = jwt.sign({ id }, process.env.SECRET_KEY!, {
+    expiresIn: process.env.EXPIRATION,
+  });
+  const decoded = jwt.decode(token) as jwt.JwtPayload;
+  return {
+    token,
+    expiresIn: decoded.exp! - decoded.iat!,
+    ...pick(decoded, ["exp", "iat"]),
+  };
+};
 
 export const sendTokenResponse = (
   res: e.Response,
   statusCode: number,
   user: InstanceType<typeof User>
 ) => {
-  const token = jwt.sign(pick(user, ["id"]), process.env.SECRET_KEY!, {
-    expiresIn: process.env.EXPIRATION,
-  });
-  const decoded = jwt.decode(token) as jwt.JwtPayload;
-  res.cookie(tokenCookieName, token, {
-    httpOnly: true,
-    secure: isProdEnv,
-    maxAge: decoded.exp! - decoded.iat!,
-    sameSite: "strict",
-  });
-  user.password = undefined!;
+  const token = genAuthToken(user.id);
+  user.active = user.password = undefined!;
   res.status(statusCode).json({
     status: "success",
-    data: { user }
+    data: { user, ...token },
   });
 };
+
+// export const sendTokenResponse = (
+//   res: e.Response,
+//   statusCode: number,
+//   user: InstanceType<typeof User>
+// ) => {
+//   const token = jwt.sign(pick(user, ["id"]), process.env.SECRET_KEY!, {
+//     expiresIn: process.env.EXPIRATION,
+//   });
+//   const decoded = jwt.decode(token) as jwt.JwtPayload;
+//   res.cookie(tokenCookieName, token, {
+//     httpOnly: true,
+//     secure: isProdEnv,
+//     maxAge: decoded.exp! - decoded.iat!,
+//     sameSite: "strict",
+//   });
+//   user.password = undefined!;
+//   res.status(statusCode).json({
+//     status: "success",
+//     data: { user }
+//   });
+// };
 
 export const register = asyncErrorHandler(async (req, res, next) => {
   const user = await User.create(req.body);
@@ -68,15 +71,15 @@ export const login = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const protect = asyncErrorHandler(async (req, res, next) => {
-  // if (!req.headers.authorization) {
-  //   throw new CustomError("Authorization header is missing.", 401);
-  // }
-  // const [bearer, token] = req.headers.authorization?.split(" ");
-  // if (bearer !== "Bearer") {
-  //   throw new CustomError("Authorization header is not a <Bearer> token.", 401);
-  // }
+  if (!req.headers.authorization) {
+    throw new CustomError("Authorization header is missing.", 401);
+  }
+  const [bearer, token] = req.headers.authorization?.split(" ");
+  if (bearer !== "Bearer") {
+    throw new CustomError("Authorization header is not a <Bearer> token.", 401);
+  }
 
-  const token = req.cookies[tokenCookieName];
+  // const token = req.cookies[tokenCookieName];
   if (!token) {
     throw new CustomError("Access denied. No token provided.", 401);
   }

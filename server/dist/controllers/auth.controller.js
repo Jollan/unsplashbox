@@ -20,44 +20,43 @@ const customError_1 = __importDefault(require("../utils/customError"));
 const lodash_1 = require("lodash");
 const tokenCookieName = "jwt";
 const isProdEnv = process.env.NODE_ENV === "production";
-// const genAuthToken = (id: string) => {
-//   const token = jwt.sign({ id }, process.env.SECRET_KEY!, {
-//     expiresIn: process.env.EXPIRATION,
-//   });
-//   const decoded = jwt.decode(token) as jwt.JwtPayload;
-//   return { token, expiresIn: decoded.exp! - decoded.iat! };
-// };
+const genAuthToken = (id) => {
+    const token = jsonwebtoken_1.default.sign({ id }, process.env.SECRET_KEY, {
+        expiresIn: process.env.EXPIRATION,
+    });
+    const decoded = jsonwebtoken_1.default.decode(token);
+    return Object.assign({ token, expiresIn: decoded.exp - decoded.iat }, (0, lodash_1.pick)(decoded, ["exp", "iat"]));
+};
+const sendTokenResponse = (res, statusCode, user) => {
+    const token = genAuthToken(user.id);
+    user.active = user.password = undefined;
+    res.status(statusCode).json({
+        status: "success",
+        data: Object.assign({ user }, token),
+    });
+};
+exports.sendTokenResponse = sendTokenResponse;
 // export const sendTokenResponse = (
 //   res: e.Response,
 //   statusCode: number,
 //   user: InstanceType<typeof User>
 // ) => {
-//   const token = genAuthToken(user.id);
-//   user.active = user.password = undefined!;
+//   const token = jwt.sign(pick(user, ["id"]), process.env.SECRET_KEY!, {
+//     expiresIn: process.env.EXPIRATION,
+//   });
+//   const decoded = jwt.decode(token) as jwt.JwtPayload;
+//   res.cookie(tokenCookieName, token, {
+//     httpOnly: true,
+//     secure: isProdEnv,
+//     maxAge: decoded.exp! - decoded.iat!,
+//     sameSite: "strict",
+//   });
+//   user.password = undefined!;
 //   res.status(statusCode).json({
 //     status: "success",
-//     user,
-//     ...token,
+//     data: { user }
 //   });
 // };
-const sendTokenResponse = (res, statusCode, user) => {
-    const token = jsonwebtoken_1.default.sign((0, lodash_1.pick)(user, ["id"]), process.env.SECRET_KEY, {
-        expiresIn: process.env.EXPIRATION,
-    });
-    const decoded = jsonwebtoken_1.default.decode(token);
-    res.cookie(tokenCookieName, token, {
-        httpOnly: true,
-        secure: isProdEnv,
-        maxAge: decoded.exp - decoded.iat,
-        sameSite: "strict",
-    });
-    user.password = undefined;
-    res.status(statusCode).json({
-        status: "success",
-        data: { user }
-    });
-};
-exports.sendTokenResponse = sendTokenResponse;
 exports.register = (0, asyncErrorHandler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.default.create(req.body);
     (0, exports.sendTokenResponse)(res, 201, user);
@@ -71,14 +70,15 @@ exports.login = (0, asyncErrorHandler_1.default)((req, res, next) => __awaiter(v
     (0, exports.sendTokenResponse)(res, 200, user);
 }));
 exports.protect = (0, asyncErrorHandler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // if (!req.headers.authorization) {
-    //   throw new CustomError("Authorization header is missing.", 401);
-    // }
-    // const [bearer, token] = req.headers.authorization?.split(" ");
-    // if (bearer !== "Bearer") {
-    //   throw new CustomError("Authorization header is not a <Bearer> token.", 401);
-    // }
-    const token = req.cookies[tokenCookieName];
+    var _a;
+    if (!req.headers.authorization) {
+        throw new customError_1.default("Authorization header is missing.", 401);
+    }
+    const [bearer, token] = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ");
+    if (bearer !== "Bearer") {
+        throw new customError_1.default("Authorization header is not a <Bearer> token.", 401);
+    }
+    // const token = req.cookies[tokenCookieName];
     if (!token) {
         throw new customError_1.default("Access denied. No token provided.", 401);
     }

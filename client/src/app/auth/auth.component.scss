@@ -1,0 +1,44 @@
+@use "../../partials/variables" as vars;
+
+.content {
+  // border: 1px solid black;
+  height: calc(100vh - vars.$navbarh);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .form {
+    width: 500px;
+    padding: 30px 30px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    form {
+      .input {
+        margin-top: 10px;
+        input {
+          width: 100%;
+          border: 2px solid #eee ;
+          padding: 10px 20px;
+        }
+      }
+      > .button {
+        width: 100%;
+        padding: 10px;
+        margin: 15px 0px;
+        border: none;
+        background-color: #28282b;
+        font-size: large;
+        font-weight: bold;
+        color: white;
+      }
+      p {
+        .button {
+          border: none;
+          font-size: 16px;
+          background-color: transparent;
+          color: #0e0ede;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

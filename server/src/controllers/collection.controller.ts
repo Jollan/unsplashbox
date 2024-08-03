@@ -11,21 +11,23 @@ export const getCollections = asyncErrorHandler(async (req, res) => {
   );
   res.status(200).json({
     status: "success",
-    data: { collections },
+    data: { count: collections.length, collections },
   });
 });
 
 export const createCollection = asyncErrorHandler(async (req, res) => {
-  const image = await newImage(req).save();
+  let image = await newImage(req).save();
+  const imagePath = image.path;
+  image.path = undefined!;
   try {
     var collection = await Collection.create({
       ...req.body,
-      images: [image._id],
+      images: [image],
       user: req.user!._id,
     });
   } catch (error) {
     await Image.findByIdAndDelete(image);
-    fs.unlinkSync(path.resolve(image.path));
+    fs.unlink(path.resolve(imagePath), (errot) => {});
     throw error;
   }
   res.status(201).json({

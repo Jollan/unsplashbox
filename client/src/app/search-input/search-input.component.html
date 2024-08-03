@@ -1,0 +1,12 @@
+<div class="input">
+  <input
+    type="text"
+    placeholder="Enter your keywords..."
+    (keydown.enter)="this.keyword.emit(input.value)"
+    ngModel
+    #input="ngModel"
+  />
+  <div class="search-icon">
+    <img src="Search.svg" alt="search-icon" />
+  </div>
+</div>

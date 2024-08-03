@@ -1,0 +1,30 @@
+@use "../../partials/variables" as vars;
+@import "../../partials/responsives";
+
+.ui.fluid.container {
+  // border: 1px solid black;
+  height: calc(100vh - vars.$navbarh);
+  background: no-repeat center/100% 80% url("../../../public/hero-image.png");
+  @include mobile {
+    background: repeat center/100% 50% url("../../../public/hero-image.png");
+  }
+  .content {
+    height: 100%;
+    padding-top: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: #121826;
+    p {
+      font-size: small;
+      margin-bottom: 10px;
+    }
+    .search-input {
+      width: 40%;
+      @include mobile {
+        width: 100%;
+      }
+    }
+  }
+}

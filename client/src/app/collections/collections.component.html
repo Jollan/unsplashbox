@@ -1,0 +1,41 @@
+<div class="ui fluid container">
+  <div class="content">
+    <div class="head">
+      <h1>Collections</h1>
+      <p>
+        Explore the world through collections of beautiful photos free to use
+        under the <strong>Unsplash License</strong>.
+      </p>
+    </div>
+    <div
+      class="ui three column padded grid container"
+      *let="collections$ | async as collections"
+    >
+      @for (collection of collections; track $index) {
+      <ng-container *let="collection.images.slice(0, 3) as images">
+        @let _0 = images[0] ? images[0]._id : ''; 
+        @let _1 = images[1] ? ',' + images[1]._id : ''; 
+        @let _2 = images[2] ?  ',' + images[2]._id : ''; 
+
+        <ng-container *let="(_0 + _1 + _2).trim() as ids" >
+          <ng-container *ngIf="ids">
+            <div class="column">
+              <img
+                class="thumbnail"
+                [src]="apiUrl + '?ids=' + ids + '&width=500&height=300'"
+                [routerLink]="['./', collection._id]"
+              />
+              <div class="info">
+                <div class="name">{{ collection.name }}</div>
+                <div class="photo-count">
+                  {{ collection.images.length }} photos
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      }
+    </div>
+  </div>
+</div>
