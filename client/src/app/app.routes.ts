@@ -14,7 +14,6 @@ export const routes: Routes = [
   {
     path: 'search/result/:keyword',
     component: SearchResultComponent,
-    canActivate: [CanActivate],
   },
   {
     path: 'image/details',

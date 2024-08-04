@@ -3,7 +3,7 @@
 @import "../../partials/responsives";
 
 .container {
-  @include mobileAndTablet {
+  @include mobile {
     @include mixins.relaxed;
   }
 }
@@ -43,12 +43,20 @@
           }
         }
       }
-      @include mobileAndTablet {
+      @include mobile {
+        display: flex;
         flex-direction: column;
         padding: 10px 0 !important;
         .column {
           width: 100% !important;
-          height: 50% !important;
+        }
+        > :first-child {
+          height: 40% !important;
+          justify-content: center !important;
+        }
+        > :last-child {
+          height: 60%;
+          padding-top: 10px;
         }
       }
       padding: 3rem;
@@ -56,9 +64,6 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        @include mobileAndTablet {
-          justify-content: center;
-        }
         img {
           max-width: 100%;
           max-height: 100%;
@@ -69,20 +74,13 @@
         .first-row {
           // border: 1px solid black;
           height: 30%;
-          @include mobileAndTablet {
-            display: flex;
-            flex-direction: column;
-            .author {
-              margin-bottom: 0 !important;
-            }
-          }
           .author {
+            height: 60px;
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: bold;
             font-size: small;
-            margin-bottom: 15px;
             .avatar {
               height: 50px;
               width: 50px;
@@ -90,9 +88,9 @@
             }
           }
           .date {
+            height: 25px;
             color: #6c727f;
             font-size: small;
-            margin-bottom: 15px;
           }
           .buttons {
             height: 40px;
@@ -100,6 +98,13 @@
             gap: 15px;
             @include mobileLandscape {
               justify-content: center;
+              button,
+              a {
+                padding: 0 15px !important;
+                span {
+                  display: none !important;
+                }
+              }
             }
             button,
             a {
@@ -107,18 +112,9 @@
               font-weight: bold;
               padding: 0 25px;
               border-radius: 5px;
-              @include mobileAndTablet {
-                border-radius: 15px;
-              }
               display: flex;
               align-items: center;
               gap: 5px;
-              @include mobileLandscape {
-                padding: 0 15px;
-                span {
-                  display: none;
-                }
-              }
             }
             button {
               border: 0;
@@ -134,7 +130,7 @@
           height: 70%;
           $p: 30px;
           padding-top: $p;
-          @include mobileAndTablet {
+          @include mobile {
             $p: 20px;
             padding-top: $p;
             .collections {
@@ -155,7 +151,7 @@
           .collections {
             position: relative;
             border-radius: 5px;
-            height: calc(100% - 30px - $p - 15px);
+            height: calc(100% - $p - 30px  - 15px);
             padding: 0 10px;
             overflow-y: scroll;
             &::-webkit-scrollbar {
@@ -174,8 +170,7 @@
 .image.add {
   position: absolute;
   width: 550px;
-  height:75vh;
-  z-index: 2;
+  height: 75vh;
   top: 50%;
   margin-top: calc(75vh / -2);
   left: 50%;
@@ -184,4 +179,5 @@
     width: 90vw !important;
     margin-left: calc(90vw / -2) !important;
   }
+  z-index: 2;
 }

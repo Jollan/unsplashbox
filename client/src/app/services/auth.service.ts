@@ -11,7 +11,7 @@ type AuthResponse = JsonResponse<UserData>;
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  userData: UserData;
+  userData?: UserData | null;
 
   login(body: Credentials) {
     return this.http.post<AuthResponse>(`${environment.api}/auth/login`, body);

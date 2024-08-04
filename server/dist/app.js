@@ -16,6 +16,7 @@ const collection_routes_1 = __importDefault(require("./routes/collection.routes"
 const error_controller_1 = __importDefault(require("./controllers/error.controller"));
 const image_controller_1 = require("./controllers/image.controller");
 const app = (0, express_1.default)();
+app.set('trust proxy', true);
 const limiter = (0, express_rate_limit_1.default)({
     limit: 1000,
     windowMs: 60 * 60 * 1000,

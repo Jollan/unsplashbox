@@ -4,8 +4,8 @@ import { AuthService } from '../services/auth.service';
 
 export const CanActivate = () => {
   const router = inject(Router);
-  const auth = inject(AuthService);
-  const data = auth.userData ?? JSON.parse(localStorage.getItem('userData')!);
+  const authService = inject(AuthService);
+  const data = authService.userData;
 
   if (!data) {
     router.navigateByUrl('/authen');
@@ -15,7 +15,7 @@ export const CanActivate = () => {
       router.navigateByUrl('/authen');
       return false;
     }
-    auth.userData = data;
+    authService.userData = data;
     return true;
   }
 };

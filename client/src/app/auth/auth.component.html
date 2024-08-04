@@ -1,5 +1,8 @@
 <div class="content">
   <div class="form">
+    <app-dimmer *ngIf="!loaderService.loaded()">
+      <app-loader type="spin"></app-loader>
+    </app-dimmer>
     @let mode = loginMode ? "Login" : "Register";
     <h2>{{ mode }} Here</h2>
     <form (ngSubmit)="onFormSubmitted()" #form="ngForm">
@@ -12,7 +15,11 @@
           placeholder="Enter your name"
           required
           ngModel
+          #name="ngModel"
         />
+        <ng-container *ngIf="name.invalid && name.touched">
+          <span>You must enter a value !</span>
+        </ng-container>
       </div>
       <div class="input">
         <label for="email">Email Address</label>
@@ -24,7 +31,15 @@
           required
           email
           ngModel
+          #email="ngModel"
         />
+        <ng-container *ngIf="email.invalid && email.touched">
+          @if (email.errors?.['required']) {
+          <span>You must enter a value !</span>
+          } @else {
+          <span>Enter a valid email !</span>
+          }
+        </ng-container>
       </div>
       <div class="input">
         <label for="password">Password</label>
@@ -36,7 +51,15 @@
           required
           minlength="8"
           ngModel
+          #pass="ngModel"
         />
+        <ng-container *ngIf="pass.invalid && pass.touched">
+          @if (pass.errors?.['required']) {
+          <span>You must enter a value !</span>
+          } @else {
+          <span> At least 8 characters !</span>
+          }
+        </ng-container>
       </div>
       <div class="input" *ngIf="!loginMode">
         <label for="confpassword">Confirm Password</label>
@@ -48,9 +71,19 @@
           required
           minlength="8"
           ngModel
+          #conf="ngModel"
         />
+        <ng-container *ngIf="conf.invalid && conf.touched">
+          @if (conf.errors?.['required']) {
+          <span>You must enter a value !</span>
+          } @else {
+          <span> At least 8 characters !</span>
+          }
+        </ng-container>
       </div>
-      <button type="submit" class="button">{{ mode }}</button>
+      <button type="submit" [disabled]="form.invalid" class="button">
+        {{ mode }}
+      </button>
       <p>
         {{
           loginMode ? "Do not have an accout yet?" : "Already have an account ?"

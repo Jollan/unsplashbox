@@ -14,6 +14,8 @@ import { setResourcePolicy } from "./controllers/image.controller";
 
 const app = express();
 
+app.set('trust proxy', true);
+
 const limiter = rateLimit({
   limit: 1000,
   windowMs: 60 * 60 * 1000,

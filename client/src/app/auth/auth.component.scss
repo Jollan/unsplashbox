@@ -1,4 +1,5 @@
 @use "../../partials/variables" as vars;
+@import "../../partials/responsives";
 
 .content {
   // border: 1px solid black;
@@ -7,7 +8,11 @@
   justify-content: center;
   align-items: center;
   .form {
+    position: relative;
     width: 500px;
+    @include mobile {
+      width: 90vw !important;
+    }
     padding: 30px 30px;
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
@@ -16,8 +21,19 @@
         margin-top: 10px;
         input {
           width: 100%;
-          border: 2px solid #eee ;
-          padding: 10px 20px;
+          border: 2px solid #eee;
+          padding: 10px 5px;
+          &.ng-touched.ng-invalid {
+            border: 2px solid #b12a2a;
+          }
+          &.ng-touched.ng-valid {
+            border: 2px solid #3bb66a;
+          }
+          & + span {
+            color: #b12a2a;
+            font-weight: bold;
+            font-size: x-small;
+          }
         }
       }
       > .button {
@@ -29,6 +45,10 @@
         font-size: large;
         font-weight: bold;
         color: white;
+        cursor: pointer;
+        &:disabled {
+          cursor: not-allowed;
+        }
       }
       p {
         .button {

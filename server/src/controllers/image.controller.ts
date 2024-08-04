@@ -40,7 +40,8 @@ export const upload = asyncErrorHandler(
 );
 
 export function newImage(req: any) {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const protocol = req.get("X-Forwarded-Proto") || req.protocol;
+  const baseUrl = `${protocol}://${req.get("host")}`;
   const url = `${baseUrl}/images/${req.user!.id}/${req.file.filename}`;
   const image = new Image({ ...req.body, ...req.file, url });
   return image;
@@ -128,7 +129,7 @@ export const getImage = asyncErrorHandler(async (req, res) => {
   [ids, width, height] = [ids?.trim(), +width?.trim(), +height?.trim()];
   if (!ids || !width || !height) {
     throw new CustomError(
-      "Missing some info. Perhaps <images> or <height> or <width>.",
+      "Missing some info. Perhaps <ids> or <height> or <width>.",
       404
     );
   }

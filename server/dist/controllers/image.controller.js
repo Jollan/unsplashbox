@@ -50,7 +50,8 @@ const multerConfig = (0, multer_1.default)({
 });
 exports.upload = (0, asyncErrorHandler_1.default)(util_1.default.promisify(multerConfig.single("image")));
 function newImage(req) {
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const protocol = req.get("X-Forwarded-Proto") || req.protocol;
+    const baseUrl = `${protocol}://${req.get("host")}`;
     const url = `${baseUrl}/images/${req.user.id}/${req.file.filename}`;
     const image = new image_model_1.default(Object.assign(Object.assign(Object.assign({}, req.body), req.file), { url }));
     return image;
@@ -128,7 +129,7 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
     let { ids, width, height } = req.query;
     [ids, width, height] = [ids === null || ids === void 0 ? void 0 : ids.trim(), +(width === null || width === void 0 ? void 0 : width.trim()), +(height === null || height === void 0 ? void 0 : height.trim())];
     if (!ids || !width || !height) {
-        throw new customError_1.default("Missing some info. Perhaps <images> or <height> or <width>.", 404);
+        throw new customError_1.default("Missing some info. Perhaps <ids> or <height> or <width>.", 404);
     }
     // Sanitization
     let imgIds = ids

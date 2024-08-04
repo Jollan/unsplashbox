@@ -19,9 +19,9 @@ $bgimgh: 70px;
     align-items: center;
     padding-top: calc($bgimgh - vars.$inputh / 2);
     .search-input {
-      width: 35%;
+      width: 450px;
       @include mobile {
-       width: 90%;
+        width: 90%;
       }
       margin-bottom: 30px;
     }

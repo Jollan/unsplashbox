@@ -36,5 +36,16 @@
         border-radius: 5px;
       }
     }
+    .connectivity {
+      .log {
+        height: 30px;
+        @include mobile {
+          height: 25px;
+        }
+        &.hide {
+          display: none;
+        }
+      }
+    }
   }
 }

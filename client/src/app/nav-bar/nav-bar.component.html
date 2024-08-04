@@ -11,5 +11,24 @@
     <div class="link item" routerLink="/collections" routerLinkActive="active">
       Collections
     </div>
+    <div class="connectivity">
+      @if (authService.userData) {
+      <img
+        class="log item"
+        src="logout.svg"
+        alt="logout"
+        routerLink="/authen"
+        (click)="logout()"
+      />
+      } @else {
+      <img
+        class="log item"
+        src="login.svg"
+        alt="login"
+        routerLink="/authen"
+        routerLinkActive="hide"
+      />
+      }
+    </div>
   </div>
 </header>
