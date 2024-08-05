@@ -1,8 +1,8 @@
 <div class="content">
   <div class="form">
-    <app-dimmer *ngIf="!loaderService.loaded()">
+    <div class="spinner-container" *ngIf="!loaderService.loaded()">
       <app-loader type="spin"></app-loader>
-    </app-dimmer>
+    </div>
     @let mode = loginMode ? "Login" : "Register";
     <h2>{{ mode }} Here</h2>
     <form (ngSubmit)="onFormSubmitted()" #form="ngForm">

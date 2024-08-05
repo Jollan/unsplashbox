@@ -5,18 +5,17 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { AlertService } from '../services/alert.service';
 import { LoaderService } from '../services/loader.service';
-import { DimmerComponent } from '../utils/dimmer/dimmer.component';
 import { LoaderComponent } from '../utils/loader/loader.component';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [CommonModule, FormsModule, DimmerComponent, LoaderComponent],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
 })
 export class AuthComponent {
-  readonly router = inject(Router);
+  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly alertService = inject(AlertService);
   readonly loaderService = inject(LoaderService);
@@ -37,7 +36,7 @@ export class AuthComponent {
           'userData',
           JSON.stringify((this.authService.userData = data))
         );
-        history.back();
+        this.router.navigateByUrl('/home');
       },
       error: (error) => {
         this.alertService.message.set({

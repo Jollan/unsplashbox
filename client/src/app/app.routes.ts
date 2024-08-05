@@ -6,11 +6,14 @@ import { CanActivate } from './guards/auth.guard';
 import { ImageDetailsComponent } from './image-details/image-details.component';
 import { CollectionsComponent } from './collections/collections.component';
 import { ImagesComponent } from './collections/images/images.component';
+import { LogoutComponent } from './logout/logout.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'authen', component: AuthComponent },
+  { path: 'logout', component: LogoutComponent },
   {
     path: 'search/result/:keyword',
     component: SearchResultComponent,
@@ -34,5 +37,9 @@ export const routes: Routes = [
     path: 'images/:id',
     component: ImageDetailsComponent,
     canActivate: [CanActivate],
+  },
+  {
+    path: '**',
+    component: NotFoundComponent,
   },
 ];

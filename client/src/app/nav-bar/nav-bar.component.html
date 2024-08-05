@@ -17,8 +17,7 @@
         class="log item"
         src="logout.svg"
         alt="logout"
-        routerLink="/authen"
-        (click)="logout()"
+        (click)="authService.logout()"
       />
       } @else {
       <img

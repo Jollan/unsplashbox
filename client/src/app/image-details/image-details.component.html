@@ -11,7 +11,7 @@
             <span>{{ author }}</span>
           </div>
           <div class="date">
-            Publish on {{ publishedDate | date : "fullDate" }}
+            Publish on {{ publishedDate | date : "mediumDate" }}
           </div>
           <div class="buttons">
             <button class="button" (click)="addMode = true">
@@ -27,10 +27,11 @@
         <div class="second-row">
           <h2 class="title">Collections</h2>
           <div class="collections">
-            <app-dimmer *ngIf="!loaderService.loaded() && !addMode">
+            @if (!loaderService.loaded() && !addMode) {
+            <div class="spinner-container">
               <app-loader type="spin"></app-loader>
-            </app-dimmer>
-            @for (collection of collections; track $index) {
+            </div>
+            } @for (collection of collections; track $index) {
             <ng-container *let="collection.images[0]?._id as id">
               <ng-container *ngIf="id">
                 <app-collection

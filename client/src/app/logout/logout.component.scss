@@ -1,0 +1,11 @@
+@use "../../partials/mixins" as mixins;
+
+.container {
+  @include mixins.dimmer {
+    position: fixed;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  .text {
+    font-weight: bold;
+  }
+}

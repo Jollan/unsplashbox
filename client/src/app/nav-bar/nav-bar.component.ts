@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -17,8 +17,4 @@ export class NavBarComponent implements OnInit {
    this.authService.userData = JSON.parse(localStorage.getItem('userData')!);
   }
   
-  logout() {
-    this.authService.userData = null;
-    localStorage.removeItem('userData');
-  }
 }
