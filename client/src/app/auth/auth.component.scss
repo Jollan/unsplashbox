@@ -56,6 +56,9 @@
         }
       }
       p {
+        @include mobile {
+          font-size: small;
+        }
         .button {
           border: none;
           font-size: 16px;

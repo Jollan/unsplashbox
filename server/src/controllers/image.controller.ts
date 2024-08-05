@@ -143,7 +143,7 @@ export const getImage = asyncErrorHandler(async (req, res) => {
         background: { r: 255, g: 255, b: 255, alpha: 1 },
       });
     }
-    return image.png().toBuffer();
+    return image.toBuffer();
   });
 
   if (resizedBuffers.length === 1) outputBuffer = await resizedBuffers[0];
@@ -174,9 +174,9 @@ export const getImage = asyncErrorHandler(async (req, res) => {
         background: { r: 255, g: 255, b: 255 },
       },
     })
-      .png()
+      .jpeg()
       .composite(imagesToComposite)
       .toBuffer();
   }
-  res.status(200).type("image/png").send(outputBuffer);
+  res.status(200).type("image/jpeg").send(outputBuffer);
 });

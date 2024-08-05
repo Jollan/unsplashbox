@@ -142,7 +142,7 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
                 background: { r: 255, g: 255, b: 255, alpha: 1 },
             });
         }
-        return image.png().toBuffer();
+        return image.toBuffer();
     });
     if (resizedBuffers.length === 1)
         outputBuffer = yield resizedBuffers[0];
@@ -172,9 +172,9 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
                 background: { r: 255, g: 255, b: 255 },
             },
         })
-            .png()
+            .jpeg()
             .composite(imagesToComposite)
             .toBuffer();
     }
-    res.status(200).type("image/png").send(outputBuffer);
+    res.status(200).type("image/jpeg").send(outputBuffer);
 }));
