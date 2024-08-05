@@ -3,13 +3,9 @@
 @import "../../../partials/responsives";
 
 .ui.fluid.container {
-    // border: 1px solid black;
-  @include mobile {
-    @include mixins.relaxed;
-  }
+  // border: 1px solid black;
+  @include mixins.relaxed;
   min-height: calc(100vh - vars.$navbarh);
-  display: flex;
-  justify-content: center;
   .content {
     padding-top: 30px;
     .head {
@@ -28,11 +24,11 @@
         font-size: small;
       }
     }
-
     .grid.container {
+      @include mixins.relaxed;
       $gap: 10px;
       > * {
-        padding: calc($gap/2);
+        padding: calc($gap / 2);
       }
       .column {
         display: flex;

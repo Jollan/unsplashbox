@@ -29,7 +29,7 @@ const express_1 = __importDefault(require("express"));
 const imageController = __importStar(require("../controllers/image.controller"));
 const authControllers = __importStar(require("../controllers/auth.controller"));
 const imageRouter = express_1.default.Router();
-imageRouter.post("/:collectionId", authControllers.protect, imageController.upload, imageController.createImage);
+imageRouter.post("/:collectionId", authControllers.protect, imageController.createImage);
 imageRouter.delete("/:collectionId/:unsplashId", authControllers.protect, imageController.removeImage);
 imageRouter.get("/search", imageController.search);
 imageRouter.get("/thumb", imageController.setResourcePolicy, imageController.getImage);

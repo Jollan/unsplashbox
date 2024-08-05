@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { LoaderComponent } from '../utils/loader/loader.component';
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly alertService = inject(AlertService);
@@ -24,6 +24,12 @@ export class AuthComponent {
 
   @ViewChild('form')
   form: NgForm;
+
+  ngOnInit(): void {
+    if (this.authService.userData) {
+      history.forward();
+    }
+  }
 
   switchMode() {
     this.loginMode = !this.loginMode;

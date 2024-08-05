@@ -2,7 +2,6 @@
 @use "../../partials/mixins" as mixins;
 @import "../../partials/responsives";
 
-
 .ui.fluid.container {
   min-height: calc(100vh - vars.$navbarh);
   @include mobile {
@@ -36,9 +35,7 @@
       }
     }
     .grid.container {
-      width: fit-content !important;
-      margin: auto !important;
-      padding: 0 5px;
+      @include mixins.relaxed;
       > * {
         padding: 5px;
       }

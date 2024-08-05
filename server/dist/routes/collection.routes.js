@@ -27,9 +27,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const express_1 = __importDefault(require("express"));
 const collectionController = __importStar(require("../controllers/collection.controller"));
-const imageControllers = __importStar(require("../controllers/image.controller"));
 const authControllers = __importStar(require("../controllers/auth.controller"));
 const collectionRouter = express_1.default.Router();
-collectionRouter.post("/", authControllers.protect, imageControllers.upload, collectionController.createCollection);
+collectionRouter.post("/", authControllers.protect, collectionController.createCollection);
 collectionRouter.get("/", authControllers.protect, collectionController.getCollections);
 module.exports = collectionRouter;

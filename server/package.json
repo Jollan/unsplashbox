@@ -23,7 +23,6 @@
     "lodash": "^4.17.21",
     "mongoose": "^8.4.4",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.14",
     "sharp": "^0.33.4",
     "validator": "^13.12.0"
@@ -36,7 +35,6 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.17.7",
     "@types/morgan": "^1.9.9",
-    "@types/multer": "^1.4.11",
     "@types/node": "^20.14.11",
     "@types/nodemailer": "^6.4.15",
     "@types/validator": "^13.12.0",

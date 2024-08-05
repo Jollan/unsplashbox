@@ -6,26 +6,23 @@ $bgimgh: 70px;
 
 .fluid.container {
   // border: 1px solid black;
-  @include mobile {
-    @include mixins.relaxed;
-  }
+  @include mixins.relaxed;
   min-height: calc(100vh - vars.$navbarh);
   background: no-repeat top/100% $bgimgh
     url("../../../public/gradiend-bg@2x.png");
   .content {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding-top: calc($bgimgh - vars.$inputh / 2);
     .search-input {
       width: 450px;
       @include mobile {
         width: 90%;
       }
+      margin: auto;
       margin-bottom: 30px;
     }
     .grid.container {
+      @include mixins.relaxed;
       $gap: 10px;
       > * {
         padding: calc($gap/2);

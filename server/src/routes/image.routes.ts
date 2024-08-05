@@ -7,7 +7,6 @@ const imageRouter = e.Router();
 imageRouter.post(
   "/:collectionId",
   authControllers.protect,
-  imageController.upload,
   imageController.createImage
 );
 imageRouter.delete(

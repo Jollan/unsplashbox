@@ -12,12 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getImage = exports.setResourcePolicy = exports.search = exports.removeImage = exports.createImage = exports.upload = void 0;
-exports.newImage = newImage;
-const path_1 = __importDefault(require("path"));
-const util_1 = __importDefault(require("util"));
-const fs_1 = __importDefault(require("fs"));
-const multer_1 = __importDefault(require("multer"));
+exports.getImage = exports.setResourcePolicy = exports.search = exports.removeImage = exports.createImage = void 0;
 const sharp_1 = __importDefault(require("sharp"));
 const axios_1 = __importDefault(require("axios"));
 const asyncErrorHandler_1 = __importDefault(require("../utils/asyncErrorHandler"));
@@ -25,46 +20,14 @@ const image_model_1 = __importDefault(require("../models/image.model"));
 const customError_1 = __importDefault(require("../utils/customError"));
 const collection_model_1 = __importDefault(require("../models/collection.model"));
 const lodash_1 = require("lodash");
-const storage = multer_1.default.diskStorage({
-    destination(req, file, cb) {
-        const dirName = `uploads/images/${req.user.id}`;
-        const dirPath = path_1.default.join(path_1.default.resolve(__dirname, "../../"), dirName);
-        fs_1.default.mkdir(dirPath, { recursive: true }, (error) => {
-            cb(error, dirName);
-        });
-    },
-    filename(req, file, cb) {
-        const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(null, `${file.fieldname}-${unique}${path_1.default.extname(file.originalname)}`);
-    },
-});
-const multerConfig = (0, multer_1.default)({
-    storage,
-    fileFilter(req, file, cb) {
-        if (!file.mimetype.startsWith("image/")) {
-            cb(new customError_1.default("The file is not image.", 400));
-            return;
-        }
-        cb(null, true);
-    },
-});
-exports.upload = (0, asyncErrorHandler_1.default)(util_1.default.promisify(multerConfig.single("image")));
-function newImage(req) {
-    const protocol = req.get("X-Forwarded-Proto") || req.protocol;
-    const baseUrl = `${protocol}://${req.get("host")}`;
-    const url = `${baseUrl}/images/${req.user.id}/${req.file.filename}`;
-    const image = new image_model_1.default(Object.assign(Object.assign(Object.assign({}, req.body), req.file), { url }));
-    return image;
-}
 exports.createImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const collection = yield collection_model_1.default.findById(req.params.collectionId);
     if (!collection) {
         throw new customError_1.default("The collection does not exist.", 404);
     }
-    const image = yield newImage(req).save();
+    const image = yield image_model_1.default.create(req.body);
     collection.images.push(image._id);
     collection.save({ validateBeforeSave: false });
-    image.path = undefined;
     res.status(201).json({
         status: "success",
         data: { image },
@@ -81,10 +44,7 @@ exports.removeImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(v
     if (!image) {
         throw new customError_1.default("The image does not exist on the collection.", 404);
     }
-    const delImage = yield image_model_1.default.findByIdAndDelete(image).select("+path");
-    if (delImage) {
-        fs_1.default.unlink(path_1.default.resolve(delImage.path), (error) => { });
-    }
+    yield image_model_1.default.findByIdAndDelete(image);
     collection.images = collection.images.filter(({ unsplashId }) => {
         return unsplashId !== image.unsplashId;
     });
@@ -137,36 +97,44 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
         .splice(0, 3)
         .map((id) => id.trim())
         .filter((id) => id);
-    const images = yield image_model_1.default.find({ _id: { $in: imgIds } }).select("+path");
+    const images = yield image_model_1.default.find({ _id: { $in: imgIds } });
     if (!images.length) {
         throw new customError_1.default("No image detected.", 404);
     }
     const [, img2, img3] = images;
     let [w, h, top, bottom, left, right] = [width, height, ...[0, 0, 0, 0]];
-    let buffer;
-    const resizedBuffers = images.map((image, index) => {
+    const imageBuffers = [];
+    let outputBuffer;
+    // Get buffers
+    for (let index = 0; index < images.length; index++) {
+        const buffer = yield axios_1.default.get(images[index].url, {
+            responseType: "arraybuffer",
+        });
+        imageBuffers.push(buffer.data);
+    }
+    const resizedBuffers = imageBuffers.map((buffer, index) => {
         // Initialize sizes accordingly to image count
         if (img2 || img3) {
             if (index === 0) {
                 [w, h, top, bottom, left, right] = [
                     width * (img3 ? 0.75 : 0.5),
                     height,
-                    ...[0, 0, 0, 1],
+                    ...[0, 0, 0, 2],
                 ];
             }
             else {
                 [w, h, top, bottom, left, right] = [
                     width * (img3 ? 0.25 : 0.5),
                     height * (img3 ? 0.5 : 1),
-                    ...(index === 1 && img3 ? [0, 1, 0, 0] : [0, 0, 0, 0]),
+                    ...(index === 1 && img3 ? [0, 2, 0, 0] : [0, 0, 0, 0]),
                 ];
             }
         }
         // Resize
-        let img = (0, sharp_1.default)(path_1.default.resolve(image.path)).resize(w - (left + right), h - (top + bottom));
+        let image = (0, sharp_1.default)(buffer).resize(w - (left + right), h - (top + bottom));
         // Put borders if necessary
         if (img2 || img3) {
-            img = img.extend({
+            image = image.extend({
                 top,
                 bottom,
                 left,
@@ -174,10 +142,10 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
                 background: { r: 255, g: 255, b: 255, alpha: 1 },
             });
         }
-        return img.png().toBuffer();
+        return image.png().toBuffer();
     });
     if (resizedBuffers.length === 1)
-        buffer = yield resizedBuffers[0];
+        outputBuffer = yield resizedBuffers[0];
     else {
         // Only if there is more than one image
         const imagesToComposite = [
@@ -196,7 +164,7 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
                 left: width * 0.75,
             });
         }
-        buffer = yield (0, sharp_1.default)({
+        outputBuffer = yield (0, sharp_1.default)({
             create: {
                 width,
                 height,
@@ -208,5 +176,5 @@ exports.getImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void
             .composite(imagesToComposite)
             .toBuffer();
     }
-    res.status(200).type("image/png").send(buffer);
+    res.status(200).type("image/png").send(outputBuffer);
 }));

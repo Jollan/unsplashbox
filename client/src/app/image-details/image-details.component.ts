@@ -6,7 +6,7 @@ import { Image, ImageBody, UnsplashImage } from '../models/image.model';
 import { CommonModule } from '@angular/common';
 import { ImageService } from '../services/image.service';
 import { CollectionService } from '../services/collection.service';
-import { Collection, CollectionBody } from '../models/collection.model';
+import { Collection } from '../models/collection.model';
 import { environment } from '../../environments/environment';
 import { ActionService } from '../services/action.service';
 import { Subscription } from 'rxjs';
@@ -41,15 +41,13 @@ export class ImageDetailsComponent implements OnInit, OnDestroy {
 
   private readonly subscription = new Subscription();
   readonly apiUrl = `${environment.api}/images/thumb`;
-  private imageBlob: Blob;
+  private imageBody: ImageBody;
 
   author: string;
   profileImageUrl: string;
   publishedDate: string;
   unsplashId: string;
   filename: string;
-  width: number;
-  height: number;
   url: string;
   image: Image | UnsplashImage;
   downloadUrl: string;
@@ -72,7 +70,6 @@ export class ImageDetailsComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.imageService.getImageBlob(this.url).subscribe({
         next: (image) => {
-          this.imageBlob = image;
           this.downloadUrl = URL.createObjectURL(image);
         },
         error: (error) => {
@@ -109,18 +106,8 @@ export class ImageDetailsComponent implements OnInit, OnDestroy {
   }
 
   addToCollection(collectionId: string) {
-    const body = new ImageBody(
-      this.author,
-      this.profileImageUrl,
-      this.publishedDate,
-      this.unsplashId,
-      this.imageBlob,
-      this.filename,
-      this.width,
-      this.height
-    );
     this.subscription.add(
-      this.imageService.add(collectionId, body).subscribe({
+      this.imageService.add(collectionId, this.imageBody).subscribe({
         next: ({ data: { image } }) => {
           this.actionService.action.next([collectionId, image]);
         },
@@ -141,18 +128,7 @@ export class ImageDetailsComponent implements OnInit, OnDestroy {
   }
 
   createCollection(name: string) {
-    const body = new CollectionBody(
-      name,
-      this.author,
-      this.profileImageUrl,
-      this.publishedDate,
-      this.unsplashId,
-      this.imageBlob,
-      this.filename,
-      this.width,
-      this.height
-    );
-    this.collectionService.create(body).subscribe({
+    this.collectionService.create({ name,...this.imageBody }).subscribe({
       next: ({ data: { collection } }) => {
         this.actionService.action.next(collection);
       },
@@ -202,8 +178,8 @@ export class ImageDetailsComponent implements OnInit, OnDestroy {
   }
 
   private initProps() {
-    this.width = this.image.width;
-    this.height = this.image.height;
+     const width = this.image.width;
+     const height = this.image.height;
     if (this.image.from === 'unsplash') {
       this.author = this.image.user.name;
       const filename = this.image.description ?? this.image.alt_description;
@@ -214,12 +190,22 @@ export class ImageDetailsComponent implements OnInit, OnDestroy {
       this.profileImageUrl = this.image.user.profile_image.medium;
     } else {
       this.author = this.image.author;
-      this.filename = this.image.originalname.split('.')[0];
+      this.filename = this.image.filename;
       this.publishedDate = this.image.publishedDate;
       this.unsplashId = this.image.unsplashId;
       this.url = this.image.url;
       this.profileImageUrl = this.image.profileImageUrl;
     }
+    this.imageBody = {
+      author: this.author,
+      filename: this.filename,
+      profileImageUrl: this.profileImageUrl,
+      publishedDate: this.publishedDate,
+      unsplashId: this.unsplashId,
+      url: this.url,
+      height,
+      width
+    };
   }
 
   ngOnDestroy() {

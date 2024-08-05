@@ -16,18 +16,11 @@ const imageSchema = new mongoose_1.default.Schema({
         required: [true, requiredMsg],
         trim: true,
     },
-    originalname: {
-        type: String,
-        required: [true, requiredMsg],
-        trim: true,
-    },
     url: {
         type: String,
         required: [true, requiredMsg],
         trim: true,
     },
-    size: Number,
-    mimetype: String,
     width: {
         type: Number,
         required: [true, requiredMsg],
@@ -35,12 +28,6 @@ const imageSchema = new mongoose_1.default.Schema({
     height: {
         type: Number,
         required: [true, requiredMsg],
-    },
-    path: {
-        type: String,
-        required: [true, requiredMsg],
-        trim: true,
-        select: false,
     },
     author: {
         type: String,

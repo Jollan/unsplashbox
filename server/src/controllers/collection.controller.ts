@@ -1,9 +1,6 @@
-import fs from "fs";
-import path from "path";
 import asyncErrorHandler from "../utils/asyncErrorHandler";
 import Image from "../models/image.model";
 import Collection from "../models/collection.model";
-import { newImage } from "./image.controller";
 
 export const getCollections = asyncErrorHandler(async (req, res) => {
   const collections = await Collection.find({ user: req.user }).populate(
@@ -16,9 +13,7 @@ export const getCollections = asyncErrorHandler(async (req, res) => {
 });
 
 export const createCollection = asyncErrorHandler(async (req, res) => {
-  let image = await newImage(req).save();
-  const imagePath = image.path;
-  image.path = undefined!;
+  const image = await Image.create(req.body);
   try {
     var collection = await Collection.create({
       ...req.body,
@@ -27,7 +22,6 @@ export const createCollection = asyncErrorHandler(async (req, res) => {
     });
   } catch (error) {
     await Image.findByIdAndDelete(image);
-    fs.unlink(path.resolve(imagePath), (errot) => {});
     throw error;
   }
   res.status(201).json({

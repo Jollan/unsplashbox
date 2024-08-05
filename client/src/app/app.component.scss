@@ -5,8 +5,10 @@
 .main {
   .ui.fluid.container {
     padding-top: vars.$navbarh;
-    @include mobile {
-      @include mixins.relaxed;
+    @include mixins.relaxed {
+      
+      @include mobile {
+      }
     }
   }
 }

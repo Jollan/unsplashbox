@@ -1,12 +1,14 @@
 @use "../../partials/variables" as vars;
+@use "../../partials/mixins" as mixins;
 @import "../../partials/responsives";
 
 .ui.fluid.container {
   // border: 1px solid black;
+  @include mixins.relaxed;
   height: calc(100vh - vars.$navbarh);
   background: no-repeat center/100% 80% url("../../../public/hero-image.png");
   @include mobile {
-    background: repeat center/100% 50% url("../../../public/hero-image.png");
+    background: linear-gradient(#f2c593, #8a3282);
   }
   .content {
     height: 90%;
@@ -23,7 +25,7 @@
     .search-input {
       width: 40%;
       @include mobile {
-        width: 100%;
+        width: 90%;
       }
     }
   }
