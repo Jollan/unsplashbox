@@ -10,5 +10,5 @@ import { Component, Input } from '@angular/core';
 })
 export class LoaderComponent {
   @Input()
-  type: 'bar' | 'spin' = 'spin';
+  type: 'bar' | 'spin'| 'slide';
 }

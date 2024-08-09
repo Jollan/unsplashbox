@@ -2,7 +2,18 @@
   <div class="ui grid container">
     <div class="two column row">
       <div class="column">
-        <img class="image" [src]="url" [alt]="filename" />
+        @let img = { loaded: false };
+        <img
+          class="image"
+          [src]="url"
+          [alt]="filename"
+          (load)="img.loaded = true"
+        />
+        @if (!img.loaded) {
+        <div class="loader-container">
+          <app-loader type="slide"></app-loader>
+        </div>
+        }
       </div>
       <div class="column">
         <div class="first-row">
@@ -44,6 +55,10 @@
                 ></app-collection>
               </ng-container>
             </ng-container>
+            } @empty {
+            <span class="empty">
+              @if (!loaderService.loaded()) {Loading...} @else{No Collections}
+            </span>
             }
           </div>
         </div>

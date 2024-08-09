@@ -4,8 +4,9 @@
 
 .ui.fluid.container {
   min-height: calc(100vh - vars.$navbarh);
-  @include mobile {
-    @include mixins.relaxed;
+  @include mixins.relaxed {
+    padding-left: 2px;
+    padding-right: 2px;
   }
   .content {
     padding-top: 30px;
@@ -40,11 +41,6 @@
         padding: 5px;
       }
       .column {
-        .thumbnail {
-          cursor: pointer;
-          border-radius: 5px;
-          width: 100%;
-        }
         .info {
           margin-top: 10px;
           .name {
@@ -55,6 +51,10 @@
             font-size: xx-small;
             color: #6c727f;
           }
+        }
+      }
+      .empty {
+        @include mixins.empty {
         }
       }
     }

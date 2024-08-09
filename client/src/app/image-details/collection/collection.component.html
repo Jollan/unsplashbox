@@ -1,6 +1,10 @@
 <div class="collection-wrapper">
   <div class="collection">
-    <img class="thumbnail" [src]="thumbnailUrl" alt="thumbnail" />
+    <app-image-loader
+      class="radius s-50"
+      [src]="thumbnailUrl"
+      alt="thumbnail"
+    ></app-image-loader>
     <div class="label">
       <span class="name">{{ name }}</span>
       <span class="photo-count">{{ photoCount }} photos</span>

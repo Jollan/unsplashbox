@@ -17,3 +17,14 @@
   justify-content: center;
   @content;
 }
+
+@mixin empty {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  margin: auto;
+  font-weight: bold;
+  font-size: large;
+  color: #c0c2b9f3;
+  @content;
+}

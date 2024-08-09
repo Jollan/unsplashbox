@@ -61,14 +61,6 @@ export const search = asyncErrorHandler(async (req, res) => {
       headers: { Authorization: `Client-ID ${process.env.ACCESS_KEY}` },
     }
   );
-  const { results } = result.data;
-  for (let index = 0; index < results.length; index++) {
-    const image = results[index];
-    const buffer = await axios.get(image.urls.small, {
-      responseType: "arraybuffer",
-    });
-    assign(image, await sharp(buffer.data).metadata());
-  }
   res.status(200).json({
     status: "success",
     data: result.data,

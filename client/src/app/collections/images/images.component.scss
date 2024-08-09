@@ -4,7 +4,10 @@
 
 .ui.fluid.container {
   // border: 1px solid black;
-  @include mixins.relaxed;
+  @include mixins.relaxed {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
   min-height: calc(100vh - vars.$navbarh);
   .content {
     padding-top: 30px;
@@ -29,15 +32,20 @@
       $gap: 10px;
       > * {
         padding: calc($gap / 2);
+        @include mobile {
+          padding: calc($gap/4);
+        }
       }
       .column {
         display: flex;
         flex-direction: column;
         gap: $gap;
-        .image {
-          cursor: pointer;
-          max-width: 100%;
-          max-height: 100%;
+        @include mobile {
+          gap: calc($gap/2);
+        }
+      }
+      .empty {
+        @include mixins.empty {
         }
       }
     }

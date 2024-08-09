@@ -1,16 +1,26 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { SearchInputComponent } from '../search-input/search-input.component';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ImageService, SearchResponse } from '../services/image.service';
+import { ImageService } from '../services/image.service';
 import { UnsplashImage } from '../models/image.model';
 import { CommonModule } from '@angular/common';
-import { merge, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { rearrangeImages } from '../utils/utils';
-import { PaginationComponent } from '../pagination/pagination.component';
-import { SearchResponseStateService } from '../services/search-response-state.service';
+import { StateService } from '../services/state.service';
 import { LoaderService } from '../services/loader.service';
 import { AlertService } from '../services/alert.service';
 import { LoaderComponent } from '../utils/loader/loader.component';
+import { ImageLoaderComponent } from '../image-loader/image-loader.component';
+import { State } from '../models/state.model';
 
 @Component({
   selector: 'app-search-result',
@@ -19,76 +29,86 @@ import { LoaderComponent } from '../utils/loader/loader.component';
     SearchInputComponent,
     CommonModule,
     RouterLink,
-    PaginationComponent,
     LoaderComponent,
+    ImageLoaderComponent,
   ],
   templateUrl: './search-result.component.html',
   styleUrl: './search-result.component.scss',
 })
-export class SearchResultComponent implements OnInit, OnDestroy {
+export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly imageService = inject(ImageService);
-  private readonly responseState = inject(SearchResponseStateService);
+  private readonly stateService = inject(StateService);
   private readonly alertService = inject(AlertService);
   readonly loaderService = inject(LoaderService);
 
   private readonly subscription = new Subscription();
+  @ViewChild('observer') private observer: ElementRef;
   private spontaneouslySearch = false;
   private keyword: string;
-  page: number | undefined;
-  totalPage: number;
-  unsplashImages: UnsplashImage[][];
+  private page = 1;
+  private totalPage: number;
+  unsplashImages: UnsplashImage[][] = [];
 
   ngOnInit() {
-    let paramMapEmissionCount = 0;
-    merge(
-      this.activatedRoute.paramMap,
-      this.activatedRoute.queryParamMap
-    ).subscribe({
+    this.activatedRoute.paramMap.subscribe({
       next: (paramMap) => {
-        paramMapEmissionCount += 1;
-        this.keyword = paramMap.get('keyword') || this.keyword;
-        this.page = +paramMap.get('page')! || undefined;
-        if (paramMapEmissionCount > 1) {
-          try {
-            const {
-              data: { results, total_pages },
-            } = history.state as SearchResponse;
-            this.unsplashImages = rearrangeImages(results);
-            this.totalPage = total_pages;
-          } catch (error) {
-            this.spontaneouslySearch = true;
-            this.onSearch(this.keyword, this.page);
-          }
+        this.keyword = paramMap.get('keyword')!.toLowerCase();
+        const { images, total_pages, nthPage } = history.state as State;
+        if (images) {
+          this.unsplashImages = images;
+          this.totalPage = total_pages;
+          this.page = nthPage;
+        } else {
+          this.spontaneouslySearch = true;
+          this.onSearch(this.keyword, this.page);
         }
       },
     });
   }
 
-  onSearch(keyword = this.keyword, page?: number) {
-    [this.keyword, this.page] = [keyword.trim(), page];
-    if (this.keyword) {
-      if (!page) {
-        const state = this.responseState.pages[this.keyword]?.[1];
+  ngAfterViewInit() {
+    this.initInfiniteQuery();
+    this.restoreScrollPosition();
+  }
+
+  onSearch(keyword: string, page = 1) {
+    keyword = keyword.trim().toLowerCase();
+    if (keyword) {
+      if (!this.spontaneouslySearch) {
+        if (keyword === this.keyword) return;
+        const state = this.stateService.pages[keyword];
         if (state) {
-          this.navigate(state);
+          this.router.navigate(['/search/result', keyword], {
+            onSameUrlNavigation: 'reload',
+            state,
+          });
           return;
         }
       }
       this.subscription.add(
-        this.imageService.search(this.keyword, page).subscribe({
-          next: (response) => {
-            if (this.spontaneouslySearch) {
-              this.unsplashImages = rearrangeImages(response.data.results);
-              this.totalPage = response.data.total_pages;
-              this.spontaneouslySearch = false;
+        this.imageService.search(keyword, page).subscribe({
+          next: ({ data: { results, total, total_pages } }) => {
+            if (!this.spontaneouslySearch || !this.unsplashImages.length) {
+              this.unsplashImages = rearrangeImages(results);
+              this.totalPage = total_pages;
+              this.page = 1;
+            } else {
+              rearrangeImages(results, this.unsplashImages);
             }
-            this.responseState.pages[this.keyword] = {
-              ...this.responseState.pages[this.keyword],
-              [page ?? 1]: response,
+            this.spontaneouslySearch = false;
+            const state: State = {
+              total,
+              total_pages,
+              nthPage: page,
+              images: this.unsplashImages,
             };
-            this.navigate(response, page);
+            this.stateService.pages[keyword] = state;
+            this.router.navigate(['/search/result', keyword], {
+              onSameUrlNavigation: 'reload',
+              state,
+            });
           },
           error: (error) => {
             this.alertService.message.set({
@@ -101,12 +121,34 @@ export class SearchResultComponent implements OnInit, OnDestroy {
     }
   }
 
-  private navigate(state: SearchResponse, page?: number) {
-    this.router.navigate(['/search/result', this.keyword], {
-      queryParams: { page },
-      onSameUrlNavigation: 'reload',
-      state,
+  private initInfiniteQuery() {
+    const callback: IntersectionObserverCallback = (entries) => {
+      if (entries[0].isIntersecting) {
+        if (++this.page <= this.totalPage) {
+          this.spontaneouslySearch = true;
+          this.onSearch(this.keyword, this.page);
+        } else if (this.totalPage) {
+          intersectionObserver.disconnect();
+        }
+      }
+    };
+    const intersectionObserver = new IntersectionObserver(callback, {
+      root: null,
+      rootMargin: '0px 0px 10px 0px',
     });
+    intersectionObserver.observe(this.observer.nativeElement);
+  }
+
+  @HostListener('window:scroll')
+  private onWindowScroll() {
+    this.stateService.scrollY[this.keyword] = scrollY;
+  }
+
+  private restoreScrollPosition() {
+    const lastY = this.stateService.scrollY[this.keyword];
+    if (lastY) {
+      setTimeout(() => scrollTo(0, lastY), 100);
+    }
   }
 
   ngOnDestroy() {

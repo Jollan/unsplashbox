@@ -1,0 +1,46 @@
+@import "../../partials/responsives";
+@import "../../partials/mixins";
+
+.image-container {
+  position: relative;
+  width: 100%;
+  .image {
+    position: absolute;
+    &.loaded {
+      position: relative;
+    }
+    max-width: 100%;
+    max-height: 100%;
+    margin-bottom: -4px;
+    cursor: pointer;
+    &.radius {
+      border-radius: 5px;
+    }
+    &.s-50 + * {
+      width: 50px;
+      height: 50px;
+    }
+  }
+  .loader-container {
+    position: relative;
+    height: 300px;
+    @include mobile {
+      height: 100px;
+    }
+    @include mobileLandscape {
+      height: 200px;
+    }
+    background-color: whitesmoke;
+    overflow: hidden;
+
+    .error {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: red;
+      
+    }
+  }
+}

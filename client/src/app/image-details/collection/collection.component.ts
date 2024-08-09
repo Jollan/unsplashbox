@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { Collection } from '../../models/collection.model';
+import { ImageLoaderComponent } from '../../image-loader/image-loader.component';
 
 @Component({
   selector: 'app-collection',
   standalone: true,
-  imports: [],
+  imports: [ImageLoaderComponent],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
 })

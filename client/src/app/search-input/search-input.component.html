@@ -2,8 +2,8 @@
   <input
     type="text"
     placeholder="Enter your keywords..."
+    [ngModel]="value"
     (keydown.enter)="this.keyword.emit(input.value)"
-    ngModel
     #input="ngModel"
   />
   <div class="search-icon">

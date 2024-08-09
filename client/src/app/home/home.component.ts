@@ -3,10 +3,12 @@ import { SearchInputComponent } from '../search-input/search-input.component';
 import { ImageService } from '../services/image.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SearchResponseStateService } from '../services/search-response-state.service';
+import { StateService } from '../services/state.service';
 import { LoaderComponent } from '../utils/loader/loader.component';
 import { LoaderService } from '../services/loader.service';
 import { AlertService } from '../services/alert.service';
+import { State } from '../models/state.model';
+import { rearrangeImages } from '../utils/utils';
 
 @Component({
   selector: 'app-home',
@@ -18,16 +20,16 @@ import { AlertService } from '../services/alert.service';
 export class HomeComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly imageService = inject(ImageService);
-  private readonly responseState = inject(SearchResponseStateService);
+  private readonly stateService = inject(StateService);
   private readonly alertService = inject(AlertService);
   readonly loaderService = inject(LoaderService);
 
   private readonly subscription = new Subscription();
 
   onSearch(keyword: string) {
-    keyword = keyword.trim();
+    keyword = keyword.trim().toLowerCase();
     if (keyword) {
-      const state = this.responseState.pages[keyword]?.[1];
+      const state = this.stateService.pages[keyword];
       if (state) {
         this.router.navigate(['/search/result', keyword], {
           state,
@@ -36,13 +38,15 @@ export class HomeComponent implements OnDestroy {
       }
       this.subscription.add(
         this.imageService.search(keyword).subscribe({
-          next: (response) => {
-            this.responseState.pages[keyword] = {
-              ...this.responseState.pages[keyword],
-              [1]: response,
+          next: ({ data: { results, total, total_pages } }) => {
+            const state: State = {
+              total,
+              total_pages,
+              nthPage: 1,
+              images: rearrangeImages(results),
             };
             this.router.navigate(['/search/result', keyword], {
-              state: response,
+              state,
             });
           },
           error: (error) => {

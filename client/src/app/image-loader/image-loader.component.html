@@ -1,0 +1,23 @@
+<div class="image-container">
+  @let img = { loaded: false, error: false };
+  <img
+    [class]="'image ' + class"
+    [ngClass]="{ loaded: img.loaded }"
+    [src]="src"
+    [alt]="alt"
+    [state]="state"
+    [routerLink]="route"
+    loading="lazy"
+    (load)="img.loaded = true"
+    (error)="img.error = true"
+  />
+  @if (!img.loaded) {
+  <div class="loader-container">
+    @if (!img.error) {
+    <app-loader type="slide"></app-loader>
+    } @else {
+    <span class="error">X</span>
+    }
+  </div>
+  }
+</div>

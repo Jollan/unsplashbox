@@ -51,7 +51,7 @@ export class AddImageComponent implements AfterViewInit, OnChanges {
   ngAfterViewInit() {
     this.searchInput.input.valueChanges?.subscribe({
       next: (value: string) => {
-        value = value.trim();
+        value = value?.trim();
         if (value) {
           this.searchResult = this.collections.filter((collection) => {
             return collection.name.toLowerCase().indexOf(value) !== -1;

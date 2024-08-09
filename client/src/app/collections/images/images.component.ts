@@ -1,15 +1,16 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../models/collection.model';
 import { Image } from '../../models/image.model';
 import { Subscription } from 'rxjs';
 import { rearrangeImages } from '../../utils/utils';
+import { ImageLoaderComponent } from '../../image-loader/image-loader.component';
 
 @Component({
   selector: 'app-images',
   standalone: true,
-  imports: [RouterLink],
+  imports: [ImageLoaderComponent],
   templateUrl: './images.component.html',
   styleUrl: './images.component.scss',
 })

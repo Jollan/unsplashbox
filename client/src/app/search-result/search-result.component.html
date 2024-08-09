@@ -8,20 +8,25 @@
       @for (images of unsplashImages; track $index) {
       <div class="column">
         @for (image of images; track $index) {
-        <img
-          class="image"
+        <app-image-loader
+          class="radius"
           [src]="image.urls.small"
           [alt]="image.description"
-          routerLink="/image/details"
           [state]="image"
-        />
+          route="/image/details"
+        ></app-image-loader>
         }
       </div>
+      } @empty {
+      <span class="empty">
+        @if (!loaderService.loaded()) { Loading... } @else { No results }
+      </span>
       }
     </div>
   </div>
-  <app-pagination
-    [totalPage]="totalPage"
-    [currPage]="page || 1"
-  ></app-pagination>
+  <div #observer>
+    @if (unsplashImages.length && !loaderService.loaded()) {
+    <span class="empty">Loading...</span>
+    }
+  </div>
 </div>

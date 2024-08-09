@@ -8,15 +8,17 @@
       @for (columnImages of images; track $index) {
       <div class="column">
         @for (image of columnImages; track $index) {
-        <img
-          class="image"
+        <app-image-loader
+          class="radius"
           [src]="image.url"
           [alt]="image.filename"
-          [routerLink]="['/images/', image._id]"
+          [route]="['/images/', image._id]"
           [state]="collection"
-        />
+        ></app-image-loader>
         }
       </div>
+      } @empty {
+      <span class="empty">Empty</span>
       }
     </div>
   </div>

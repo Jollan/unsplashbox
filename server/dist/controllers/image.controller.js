@@ -19,7 +19,6 @@ const asyncErrorHandler_1 = __importDefault(require("../utils/asyncErrorHandler"
 const image_model_1 = __importDefault(require("../models/image.model"));
 const customError_1 = __importDefault(require("../utils/customError"));
 const collection_model_1 = __importDefault(require("../models/collection.model"));
-const lodash_1 = require("lodash");
 exports.createImage = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const collection = yield collection_model_1.default.findById(req.params.collectionId);
     if (!collection) {
@@ -67,14 +66,6 @@ exports.search = (0, asyncErrorHandler_1.default)((req, res) => __awaiter(void 0
     const result = yield axios_1.default.get(`https://api.unsplash.com/search/photos?${params}`, {
         headers: { Authorization: `Client-ID ${process.env.ACCESS_KEY}` },
     });
-    const { results } = result.data;
-    for (let index = 0; index < results.length; index++) {
-        const image = results[index];
-        const buffer = yield axios_1.default.get(image.urls.small, {
-            responseType: "arraybuffer",
-        });
-        (0, lodash_1.assign)(image, yield (0, sharp_1.default)(buffer.data).metadata());
-    }
     res.status(200).json({
         status: "success",
         data: result.data,
